@@ -12,9 +12,9 @@ import KeychainAccess
 public final class GitProviderStore: ObservableObject {
     let keychain: Keychain
     
-    @Published var gitProviders: [GitProvider] = []
-    @Published var sshKey: SSHKey? = nil
-    
+    @Published public var gitProviders: [GitProvider] = []
+    @Published public var sshKey: SSHKey? = nil
+
     /// just a set of all the custom provider names
     let customProviderDataStore: SecureSetDataStore<CustomProviderDetails>
     

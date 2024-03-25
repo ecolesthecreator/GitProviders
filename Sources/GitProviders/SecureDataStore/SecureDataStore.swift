@@ -10,7 +10,7 @@ import KeychainAccess
 
 // always tries to get iCloud version first (but then local if there is not iCLoud version) when getting, and requires the caller specify if the value should be synced on iCloud on set/save
 
-struct SecureDataStore<T: Storeable> {
+public struct SecureDataStore<T: Storeable> {
     let key: String
     let keychain: Keychain
     

@@ -10,7 +10,7 @@ import Security
 import KeychainAccess
 
 /// Should be safe in that using and passing around the object does not put any sensitive info into memory. Any sensitive info should be exposed through explicit use of a method.
-struct SSHKey: Cred {
+public struct SSHKey: Cred {
     let keychain: Keychain
     let publicKeyKeychainName: String
     let privateKeyKeychainName: String
@@ -39,7 +39,7 @@ struct SSHKey: Cred {
     private static let defaultPublicKeyKeychainName = "id_rsa.pub"
     private static let defaultPrivateKeyKeychainName = "id_rsa"
     
-    static func get(from keychain: Keychain) -> SSHKey? {
+    public static func get(from keychain: Keychain) -> SSHKey? {
         let sshKey = SSHKey(
             keychain: keychain,
             publicKeyKeychainName: defaultPublicKeyKeychainName,

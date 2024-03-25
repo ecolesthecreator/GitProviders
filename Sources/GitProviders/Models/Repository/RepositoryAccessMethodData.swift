@@ -8,29 +8,29 @@
 import Foundation
 import SwiftGit2
 
-protocol RepositoryAccessMethodData {
+public protocol RepositoryAccessMethodData {
     var hash: Int { get }
     var userDescription: String { get }
     func toSwiftGit2Credentials() -> SwiftGit2.Credentials?
-    
+
     /// gets sensitive info!
     func getCred() -> Cred?
 }
 
-struct AnyRepositoryAccessMethodData: Identifiable, RepositoryAccessMethodData {
-    var id: Int { hash }
-    let hash: Int
-    let raw: Any
+public struct AnyRepositoryAccessMethodData: Identifiable, RepositoryAccessMethodData {
+    public var id: Int { hash }
+    public let hash: Int
+    public let raw: Any
     private let _getCred: () -> Cred?
-    func getCred() -> Cred? {
+    public func getCred() -> Cred? {
         _getCred()
     }
     private let _userDescription: () -> String
-    var userDescription: String {
+    public var userDescription: String {
         _userDescription()
     }
     let _toSwiftGit2Credentials: () -> SwiftGit2.Credentials?
-    func toSwiftGit2Credentials() -> SwiftGit2.Credentials? {
+    public func toSwiftGit2Credentials() -> SwiftGit2.Credentials? {
         _toSwiftGit2Credentials()
     }
     init<T: RepositoryAccessMethodData>(_ val: T) {

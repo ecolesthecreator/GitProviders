@@ -6,4 +6,4 @@
 //
 
 /// A protocol representing some git provider credential. 
-protocol Cred {}
+public protocol Cred {}

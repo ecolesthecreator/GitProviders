@@ -5,14 +5,24 @@
 //  Created by Joseph Hinkle on 5/13/21.
 //
 
+import SwiftGit2
 import SwiftUI
 import GitAPI
+
+extension Repository: Equatable {
+    public static func == (lhs: SwiftGit2.Repository, rhs: SwiftGit2.Repository) -> Bool {
+        return lhs.directoryURL == rhs.directoryURL
+    }
+    
+
+}
 
 public struct GitCloneOptionsView: View {
     @ObservedObject var gitProviderStore: GitProviderStore
     let appName: String
-    let closeModal: (() -> Void)?
-    
+    let disallowedRemoteUrls: Set<String>
+    let closeModal: ((Repository?, String?) -> Void)?
+
     @State private var source = 0
     @State private var repos: [Int : [RepoModel]] = [:]
     @State private var hasDownloaded: [Int : Bool] = [:]
@@ -52,11 +62,13 @@ public struct GitCloneOptionsView: View {
     public init(
         gitProviderStore: GitProviderStore,
         appName: String,
-        closeModal: (() -> Void)? = nil
+        disallowedRemoteUrls: Set<String> = [],
+        closeModal: ((Repository?, String?) -> Void)? = nil
     ) {
         self.gitProviderStore = gitProviderStore
         self.appName = appName
         self.closeModal = closeModal
+        self.disallowedRemoteUrls = disallowedRemoteUrls
     }
     
     public var body: some View {
@@ -68,7 +80,7 @@ public struct GitCloneOptionsView: View {
                 .navigationBarItems(
                     leading: Group {
                         if let closeModal = closeModal {
-                            Button("Back", action: closeModal)
+                            Button("Back", action: { closeModal(nil, nil) })
                         }
                     },
                     trailing: Group {
@@ -104,15 +116,13 @@ public struct GitCloneOptionsView: View {
                     cloningStatus: cloningStatus
                 ).modifier(DisableModalDismiss(disabled: isCloning))
             }
-        }.onChange(of: cloningStatus.status?.success ?? false) { success in
-            if success {
+        }.onChange(of: cloningStatus.status?.repository) { repository in
+            if let repository {
                 sheetItem = nil
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    closeModal?()
+                    closeModal?(repository, cloningStatus.status?.remoteUrl)
                 }
-            }
-        }.onChange(of: cloningStatus.status?.success ?? true) { success in
-            if !success {
+            } else {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     cloningStatus.status = nil
                 }
@@ -161,7 +171,7 @@ extension GitCloneOptionsView {
                     }
                 }
             }.listStyle(InsetGroupedListStyle())
-        }
+        }.padding()
     }
 }
 
@@ -205,6 +215,8 @@ extension GitCloneOptionsView {
         let repos = self.repos[source] ?? []
         let privateRepos = repos.filter {
             $0.isPrivate
+            && !disallowedRemoteUrls.contains($0.httpsURL)
+            && !disallowedRemoteUrls.contains($0.sshURL)
         }.filter {
             $0.searchScore(against: searchText) > 0
         }.sorted {

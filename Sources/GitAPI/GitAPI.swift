@@ -8,6 +8,9 @@
 import Foundation
 import Combine
 
+public enum GitApiError: Error {
+    case failedToFetch
+}
 
 fileprivate let gitAPIProcessingQueue = DispatchQueue(label: "git-api-pq")
 fileprivate var anyCancellables: [AnyCancellable] = []
@@ -58,8 +61,8 @@ extension GitAPI {
                 )
                 return (networkResponse, nil)
             }
-            return (nil, NSError())
-        }.replaceError(with: (nil, NSError()))
+            return (nil, GitApiError.failedToFetch)
+        }.replaceError(with: (nil, GitApiError.failedToFetch))
         .subscribe(on: gitAPIProcessingQueue)
         .sink(receiveValue: callback)
         .store(in: &anyCancellables)

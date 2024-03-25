@@ -8,7 +8,7 @@
 import Foundation
 import KeychainAccess
 
-struct SecureSetDataStore<T: Storeable> {
+public struct SecureSetDataStore<T: Storeable> {
     let key: String
     let syncs: Bool
     let keychain: Keychain
@@ -57,15 +57,15 @@ struct SecureSetDataStore<T: Storeable> {
     }
 }
 
-protocol Storeable: Hashable {
+public protocol Storeable: Hashable {
     func encode() -> Data
     init?(data: Data)
 }
 extension Data: Storeable {
-    func encode() -> Data {
+    public func encode() -> Data {
         self
     }
-    init?(data: Data) {
+    public init?(data: Data) {
         self = data
     }
 }

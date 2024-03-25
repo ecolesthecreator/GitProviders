@@ -60,9 +60,9 @@ struct GitCloneModalView: View {
                                     with: credentials,
                                     from: url,
                                     named: name
-                                ) { success, completedObjects, totalObjects, message in
+                                ) { repository, completedObjects, totalObjects, message in
                                     DispatchQueue.main.async {
-                                        self.cloningStatus.status = (success, completedObjects, totalObjects, message)
+                                        self.cloningStatus.status = (repository, repoURL, completedObjects, totalObjects, message)
                                     }
                                 }
                             }

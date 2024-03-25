@@ -13,9 +13,9 @@ import GitAPI
 private let _public_ssh_keys = "_public_ssh_keys"
 private let _access_token_or_password = "_access_token_or_password"
 
-struct GitProvider: Identifiable {
-    let id = UUID()
-    
+public struct GitProvider: Identifiable {
+    public let id = UUID()
+
     let preset: GitProviderPresets
     let customDetails: CustomProviderDetails?
     let keychain: Keychain
@@ -40,18 +40,18 @@ struct GitProvider: Identifiable {
     // data stores
     //
     /// We only store public keys, this way we can default to using icloud syncing without security concerns (some users may not want to use iCloud syncing with private info).
-    let sshKeyDataStore: SecureSetDataStore<Data>
-    
+    public let sshKeyDataStore: SecureSetDataStore<Data>
+
     /// We store acess tokens (senstive info!), so if icloud isn't enable for a key, another devices simply won't see the key We only allow the user to set ONE access token or password.
-    let accessTokenOrPasswordDataStore: SecureDataStore<AccessTokenOrPassword>
-    
+    public let accessTokenOrPasswordDataStore: SecureDataStore<AccessTokenOrPassword>
+
     
     //
     //
     //
     
     /// determines if the user will see this on their home screen
-    var isActive: Bool {
+    public var isActive: Bool {
         if sshKeyDataStore.count > 0 {
             return true
         } else if accessTokenOrPasswordDataStore.exists() {
@@ -215,7 +215,7 @@ struct GitProvider: Identifiable {
     
     
     
-    var allAnyRepositoryAccessMethodDatas: [AnyRepositoryAccessMethodData] {
+    public var allAnyRepositoryAccessMethodDatas: [AnyRepositoryAccessMethodData] {
         var all: [AnyRepositoryAccessMethodData] = []
         if let data = accessTokenOrPasswordDataStore.read() {
             all.append(.init(AccessTokenAccessMethodData(

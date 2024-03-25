@@ -62,7 +62,7 @@ public final class GitHubAPI: GitAPI {
                 }
             }
         } else {
-            callback(nil, NSError())
+            callback(nil, GitApiError.failedToFetch)
         }
     }
 }
