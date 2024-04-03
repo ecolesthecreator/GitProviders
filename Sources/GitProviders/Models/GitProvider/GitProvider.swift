@@ -8,6 +8,7 @@
 import Foundation
 import KeychainAccess
 import GitAPI
+import MiniGit
 
 // constants
 private let _public_ssh_keys = "_public_ssh_keys"
@@ -172,7 +173,6 @@ public struct GitProvider: Identifiable {
                 )
             }
         case .Password: return []
-        case .OAuth: return []
         }
     }
     

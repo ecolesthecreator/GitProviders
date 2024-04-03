@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import KeychainAccess
+import MiniGit
 
 public final class GitProviderStore: ObservableObject {
     let keychain: Keychain
@@ -83,5 +84,25 @@ public final class GitProviderStore: ObservableObject {
     
     func moveBackToFirstPage() {
         isMovingBackToFirstPage = true
+    }
+}
+
+extension GitProviderStore: CredentialProvider {
+    public func getCredentialForUrl(url: String) -> MiniGit.KeychainCredential? {
+        return fetchCredentials().first
+    }
+    
+    public func fetchCredentials() -> [KeychainCredential] {
+        return gitProviders
+            .flatMap { $0.allAnyRepositoryAccessMethodDatas.map { $0._toMiniGitCredentials } }
+            .compactMap { $0() }
+    }
+    
+    public func addOrUpdate(oldCredential: KeychainCredential?, cred: KeychainCredential) throws {
+        // We'll use our own mechanism
+    }
+    
+    public func remove(offsets: IndexSet) {
+        //
     }
 }

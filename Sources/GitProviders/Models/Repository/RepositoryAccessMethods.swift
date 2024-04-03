@@ -13,8 +13,7 @@ enum RepositoryAccessMethods: String, Identifiable {
     case AccessToken
     case SSH
     case Password // treated as an access token, but has a seperate case to create a distinction in the UI
-    case OAuth
-    
+
     var icon: Image {
         switch self {
         case .AccessToken:
@@ -23,8 +22,6 @@ enum RepositoryAccessMethods: String, Identifiable {
             return Image(systemName: "key.fill")
         case .Password:
             return Image(systemName: "textformat.abc")
-        case .OAuth:
-            return Image(systemName: "lock.shield")
         }
     }
     
@@ -36,8 +33,6 @@ enum RepositoryAccessMethods: String, Identifiable {
             return "Setup SSH for this device"
         case .Password:
             return nil
-        case .OAuth:
-            return "Setup OAuth for this device"
         }
     }
     
@@ -48,8 +43,6 @@ enum RepositoryAccessMethods: String, Identifiable {
         case .SSH:
             return "SSH Keys"
         case .Password:
-            return name
-        case .OAuth:
             return name
         }
     }
@@ -69,8 +62,6 @@ enum RepositoryAccessMethods: String, Identifiable {
                 }
             }
             return nil
-        case .OAuth:
-            fatalError("todo: check this device has this auth and that is isn't that we just know if it's existence")
         }
     }
     
@@ -80,8 +71,6 @@ enum RepositoryAccessMethods: String, Identifiable {
             return "Are you sure what want to delete the \((accessMethodData as? AccessTokenAccessMethodData)?.isPassword ?? false ? "password": "access token") for profile \(profileName)?"
         case .SSH:
             return "Are you sure what want to disassociate the public key \((try? (accessMethodData as? SSHAccessMethodData)?.publicKeyData.publicPEMKeyToSSHFormat()) ?? "") with profile \(profileName)?"
-        case .OAuth:
-            fatalError()
         }
     }
     
@@ -92,8 +81,6 @@ enum RepositoryAccessMethods: String, Identifiable {
         case .SSH:
             return "private key is \(isValid ? "" : "not ")on this device"
         case .Password:
-            fatalError()
-        case .OAuth:
             fatalError()
         }
     }
@@ -110,8 +97,6 @@ enum RepositoryAccessMethods: String, Identifiable {
             return AnyView(AddSSHView(gitProviderStore: gitProviderStore, preset: preset, customDetails: customDetails))
         case .Password:
             return AnyView(AddAccessTokenView(gitProviderStore: gitProviderStore, preset: preset, customDetails: customDetails, isPassword: true))
-        case .OAuth:
-            return AnyView(AddOAuthView(gitProviderStore: gitProviderStore, preset: preset, customDetails: customDetails))
         }
     }
     
@@ -120,7 +105,6 @@ enum RepositoryAccessMethods: String, Identifiable {
         case .AccessToken: return "Access Token"
         case .SSH: return rawValue
         case .Password: return rawValue
-        case .OAuth: return rawValue
         }
     }
 }

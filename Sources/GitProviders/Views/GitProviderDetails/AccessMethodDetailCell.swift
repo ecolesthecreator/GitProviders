@@ -30,24 +30,24 @@ struct AccessMethodDetailCell: View, Identifiable {
         onDeviceCred != nil
     }
     
-    func testConnection(sshCred: SSHKey) {
-        isTesting = true
-        GitProviders.testConnection(with: sshCred, domain: gitProvider.preset.domain ?? gitProvider.customDetails?.domain ?? "") {
-            testingResult = true
-            isTesting = false
-            hasFailedTest = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                testingResult = nil
-            }
-        } onFail: {
-            testingResult = false
-            isTesting = false
-            hasFailedTest = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                testingResult = nil
-            }
-        }
-    }
+//    func testConnection(sshCred: SSHKey) {
+//        isTesting = true
+//        GitProviders.testConnection(with: sshCred, domain: gitProvider.preset.domain ?? gitProvider.customDetails?.domain ?? "") {
+//            testingResult = true
+//            isTesting = false
+//            hasFailedTest = false
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                testingResult = nil
+//            }
+//        } onFail: {
+//            testingResult = false
+//            isTesting = false
+//            hasFailedTest = true
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                testingResult = nil
+//            }
+//        }
+//    }
     
     func testConnection(tokenCred: AccessTokenOrPassword, gitClient: GitAPI) {
         isTesting = true
@@ -96,17 +96,7 @@ struct AccessMethodDetailCell: View, Identifiable {
                 }.padding(.leading)
             } else {
                 if let onDeviceCred = onDeviceCred {
-                    if let sshCred = onDeviceCred as? SSHKey {
-                        Divider()
-                        Button {
-                            isTesting = true
-                            testConnection(sshCred: sshCred)
-                        } label: {
-                            Label("Test", systemImage: "wifi")
-                                .font(nil)
-                                .frame(width: 100)
-                        }
-                    } else if let tokenCred = onDeviceCred as? AccessTokenOrPassword, let gitAPI = gitProvider.preset.api {
+                    if let tokenCred = onDeviceCred as? AccessTokenOrPassword, let gitAPI = gitProvider.preset.api {
                         Divider()
                         Button {
                             isTesting = true

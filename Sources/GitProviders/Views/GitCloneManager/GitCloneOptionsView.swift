@@ -1,27 +1,27 @@
+////
+////  GitCloneOptionsView.swift
+////  
+////
+////  Created by Joseph Hinkle on 5/13/21.
+////
 //
-//  GitCloneOptionsView.swift
-//  
-//
-//  Created by Joseph Hinkle on 5/13/21.
-//
-
-import SwiftGit2
+//import SwiftGit2
 import SwiftUI
 import GitAPI
-
-extension Repository: Equatable {
-    public static func == (lhs: SwiftGit2.Repository, rhs: SwiftGit2.Repository) -> Bool {
-        return lhs.directoryURL == rhs.directoryURL
-    }
-    
-
-}
-
+//
+//extension Repository: Equatable {
+//    public static func == (lhs: SwiftGit2.Repository, rhs: SwiftGit2.Repository) -> Bool {
+//        return lhs.directoryURL == rhs.directoryURL
+//    }
+//    
+//
+//}
+//
 public struct GitCloneOptionsView: View {
     @ObservedObject var gitProviderStore: GitProviderStore
     let appName: String
     let disallowedRemoteUrls: Set<String>
-    let closeModal: ((Repository?, String?) -> Void)?
+    let closeModal: ((RepoModel?) -> Void)?
 
     @State private var source = 0
     @State private var repos: [Int : [RepoModel]] = [:]
@@ -33,10 +33,10 @@ public struct GitCloneOptionsView: View {
     @State private var selectedRepo: RepoModel? = nil
     @State private var selectedGitProvider: GitProvider? = nil
     
-    @StateObject private var cloningStatus: CloningStatus = .init()
-    var isCloning: Bool {
-        cloningStatus.status != nil
-    }
+//    @StateObject private var cloningStatus: CloningStatus = .init()
+//    var isCloning: Bool {
+//        cloningStatus.status != nil
+//    }
     
     enum SheetItems: Int, Identifiable {
         var id: Int { rawValue }
@@ -63,7 +63,7 @@ public struct GitCloneOptionsView: View {
         gitProviderStore: GitProviderStore,
         appName: String,
         disallowedRemoteUrls: Set<String> = [],
-        closeModal: ((Repository?, String?) -> Void)? = nil
+        closeModal: ((RepoModel?) -> Void)? = nil
     ) {
         self.gitProviderStore = gitProviderStore
         self.appName = appName
@@ -74,13 +74,13 @@ public struct GitCloneOptionsView: View {
     public var body: some View {
         NavigationView {
             mainBody
-                .blur(radius: isCloning ? 2.0 : 0)
-                .overlay(cloningStatus.statusOverlay)
+//                .blur(radius: isCloning ? 2.0 : 0)
+//                .overlay(cloningStatus.statusOverlay)
                 .navigationBarTitle("Git Clone", displayMode: .inline)
                 .navigationBarItems(
                     leading: Group {
                         if let closeModal = closeModal {
-                            Button("Back", action: { closeModal(nil, nil) })
+                            Button("Back", action: { closeModal(nil) })
                         }
                     },
                     trailing: Group {
@@ -92,7 +92,8 @@ public struct GitCloneOptionsView: View {
                             })
                         }
                     }
-                ).disabled(isCloning)
+                )
+//                .disabled(isCloning)
         }.navigationViewStyle(StackNavigationViewStyle())
         .sheet(item: $sheetItem, onDismiss: {
             gitProviderStore.refresh()
@@ -106,27 +107,27 @@ public struct GitCloneOptionsView: View {
                 let credOptions: [AnyRepositoryAccessMethodData] = gitProviderStore.gitProviders.reduce([], { arr, provider in
                     arr + provider.allAnyRepositoryAccessMethodDatas
                 }) + [.init(UnauthenticatedAccessMethodData())]
-                GitCloneModalView(
-                    closeModal: {
-                        self.sheetItem = nil
-                    },
-                    selectedRepo: $selectedRepo,
-                    fromGitProvider: $selectedGitProvider,
-                    credOptions: credOptions,
-                    cloningStatus: cloningStatus
-                ).modifier(DisableModalDismiss(disabled: isCloning))
+//                GitCloneModalView(
+//                    closeModal: {
+//                        self.sheetItem = nil
+//                    },
+//                    selectedRepo: $selectedRepo,
+//                    fromGitProvider: $selectedGitProvider,
+//                    credOptions: credOptions,
+//                    cloningStatus: cloningStatus
+//                ).modifier(DisableModalDismiss(disabled: isCloning))
             }
-        }.onChange(of: cloningStatus.status?.repository) { repository in
-            if let repository {
-                sheetItem = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    closeModal?(repository, cloningStatus.status?.remoteUrl)
-                }
-            } else {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    cloningStatus.status = nil
-                }
-            }
+//        }.onChange(of: cloningStatus.status?.repository) { repository in
+//            if let repository {
+//                sheetItem = nil
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//                    closeModal?(repository, cloningStatus.status?.remoteUrl)
+//                }
+//            } else {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+//                    cloningStatus.status = nil
+//                }
+//            }
         }.onChange(of: sources.count) { _ in
             if let first = sources.first {
                 source = first.id
@@ -264,11 +265,12 @@ extension GitCloneOptionsView {
                         }
                         ForEach(privateRepos) { repo in
                             RepoCellView(repo: repo) {
-                                selectedRepo = repo
-                                selectedGitProvider = selectedSource.provider
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    sheetItem = .CloneModal
-                                }
+                                closeModal?(repo)
+//                                selectedRepo = repo
+//                                selectedGitProvider = selectedSource.provider
+//                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+//                                    sheetItem = .CloneModal
+//                                }
                             }
                         }
                     }
@@ -280,11 +282,11 @@ extension GitCloneOptionsView {
                         }
                         ForEach(publicRepos) { repo in
                             RepoCellView(repo: repo) {
-                                selectedRepo = repo
-                                selectedGitProvider = selectedSource.provider
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    sheetItem = .CloneModal
-                                }
+                                closeModal?(repo)
+//                                selectedGitProvider = selectedSource.provider
+//                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+//                                    sheetItem = .CloneModal
+//                                }
                             }
                         }
                     }
@@ -300,11 +302,7 @@ extension GitCloneOptionsView {
                     }
                     ForEach(privateRepos + publicRepos) { repo in
                         RepoCellView(repo: repo) {
-                            selectedRepo = repo
-                            selectedGitProvider = selectedSource.provider
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                sheetItem = .CloneModal
-                            }
+                            closeModal?(repo)
                         }
                     }
                 }

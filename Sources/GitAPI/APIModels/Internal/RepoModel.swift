@@ -15,4 +15,8 @@ public struct RepoModel: InternalModel, Identifiable, Hashable {
     public let isPrivate: Bool
     public let size: Int
     public let updatedAt: Date
+
+    public var urlAsURLType: URL {
+        return URL(string: httpsURL)!
+    }
 }
