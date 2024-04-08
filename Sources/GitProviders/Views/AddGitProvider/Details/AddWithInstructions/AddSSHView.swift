@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct AddSSHView: View, InstructionView {
+    func testConnection(using authItem: SSHKey) {
+        // NOOP
+    }
+    
     typealias T = SSHKey
     
     @ObservedObject var gitProviderStore: GitProviderStore
@@ -48,10 +52,20 @@ struct AddSSHView: View, InstructionView {
                         // we should the user the exact link to where they add their ssh key
                         instruction(i: 4, text: "Paste your public key on \(hostName)'s page and save", link: nil, copyableText: nil)
                     }
+                    forceAddWithoutTestingStep(i: 5, key: sshKey)
 //                    testingStep(i: 5, with: sshKey, successMessage: "SSH is successfully setup for \(hostName)!")
                 }
             }
         }.listStyle(InsetGroupedListStyle())
         .navigationTitle("Add SSH for \(hostName)")
+    }
+
+    func forceAddWithoutTestingStep(i: Int, key: SSHKey) -> some View {
+        instruction(i: i, text: "Finished Adding SSH key") {
+            gitProvider?.add(sshKey: key)
+            testingResult = true
+            isTesting = false
+//            gitProviderStore.moveBackToFirstPage()
+        }
     }
 }

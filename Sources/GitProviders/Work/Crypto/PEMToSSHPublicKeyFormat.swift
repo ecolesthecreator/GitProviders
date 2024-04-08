@@ -10,6 +10,44 @@
 import Foundation
 
 extension Data {
+
+    func ecPublicKeyToSSHFormat(curveName: String = "nistp256") throws -> String {
+        // SSH key type for P-256 curve. Adjust this according to your curve.
+        let keyType = "ecdsa-sha2-\(curveName)"
+
+        var sshKey = Data()
+
+        // Add the key type
+        appendLengthPrefixedString(keyType, to: &sshKey)
+
+        // Add the curve name
+        appendLengthPrefixedString(curveName, to: &sshKey)
+
+        // Public key format in SSH for EC keys is just the raw X || Y coordinates,
+        // prefixed with the key format identifier (0x04 for uncompressed keys, which you already have).
+        // Since your data is already in this format, you can append it directly.
+        appendLengthPrefixedData(self, to: &sshKey)
+
+        // Base64 encode the entire payload
+        let base64EncodedKey = sshKey.base64EncodedString()
+
+        return "\(keyType) \(base64EncodedKey)"
+    }
+
+    // Helper to append length-prefixed string data to the SSH key data
+    func appendLengthPrefixedString(_ string: String, to data: inout Data) {
+        guard let stringData = string.data(using: .utf8) else { return }
+        appendLengthPrefixedData(stringData, to: &data)
+    }
+
+    // Helper to append length-prefixed data to the SSH key data
+    func appendLengthPrefixedData(_ dataToAdd: Data, to data: inout Data) {
+        var length = UInt32(dataToAdd.count).bigEndian
+        data.append(Data(bytes: &length, count: 4))
+        data.append(dataToAdd)
+    }
+
+
     func publicPEMKeyToSSHFormat() throws -> String {
         let node = try! Asn1Parser.parse(data: self)
         

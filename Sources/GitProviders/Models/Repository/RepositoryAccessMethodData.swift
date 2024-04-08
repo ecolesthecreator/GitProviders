@@ -77,7 +77,7 @@ struct SSHAccessMethodData: RepositoryAccessMethodData {
 
     let publicKeyData: Data
     var userDescription: String {
-        (try? publicKeyData.publicPEMKeyToSSHFormat()) ?? "SSH Key"
+        (try? publicKeyData.ecPublicKeyToSSHFormat()) ?? "SSH Key"
     }
 //    func toSwiftGit2Credentials() -> SwiftGit2.Credentials? {
 //        if let creds = getData(), let privateKeyAsPEMString = creds.privateKeyAsPEMString {
@@ -91,7 +91,7 @@ struct SSHAccessMethodData: RepositoryAccessMethodData {
 //    }
 
     func toMiniGitCredentials() -> MiniGit.KeychainCredential? {
-        return .init(id: UUID().uuidString, kind: .ssh, targetURL: "", publicKey: publicKeyData.printAsPEMPublicKey(), privateKey: publicKeyData.printAsPEMPrivateKey())
+        return .init(id: UUID().uuidString, kind: .ssh, targetURL: "", publicKey: publicKeyData.printAsPEMPublicKey(), privateKey: getData()?.privateKeyAsPEMString ?? "")
     }
 
     /// gets sensitive info!
@@ -107,7 +107,8 @@ struct AccessTokenAccessMethodData: RepositoryAccessMethodData {
     let isPassword: Bool
     let providerName: String
     var userDescription: String {
-        "\(providerName) \(isPassword ? "password" : "access token") for \(username)"
+//        "\(providerName) \(isPassword ? "password" : "access token") for \(username)"
+        return "\(providerName) | \(username)"
     }
 //    func toSwiftGit2Credentials() -> SwiftGit2.Credentials? {
 //        if let creds = getData() {

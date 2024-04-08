@@ -114,10 +114,10 @@ public struct GitProvider: Identifiable {
     
     ///
     var supportsSSH: Bool {
-        if let currentSSHKeyOfUser = currentSSHKeyOfUser,
-           let publicKeyData = currentSSHKeyOfUser.publicKeyData {
-            return sshKeyDataStore.contains(value: publicKeyData)
-        }
+//        if let currentSSHKeyOfUser = currentSSHKeyOfUser,
+//           let publicKeyData = currentSSHKeyOfUser.publicKeyData {
+//            return sshKeyDataStore.contains(value: publicKeyData)
+//        }
         return false
     }
     var supportsAccessTokenOrPassword: Bool {

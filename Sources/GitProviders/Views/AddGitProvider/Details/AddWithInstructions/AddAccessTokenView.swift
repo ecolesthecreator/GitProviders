@@ -34,33 +34,45 @@ struct AddAccessTokenView: View, InstructionView {
         isTesting = true
         DispatchQueue.global(qos: .background).async {
             authItem.gitClient.userInfo = .init(username: authItem.username, authToken: authItem.passOrAccessToken)
-            authItem.gitClient.fetchGrantedScopes { perms, _ in
+            authItem.gitClient.fetchGrantedScopes { perms, metadata, _ in
                 DispatchQueue.main.async {
+                    let now = Date()
+                    for case let .tokenExpiration(date) in metadata {
+                        if date < now {
+                            print("Token Expired: \(date)")
+                            testingResult = false
+                            return
+                        } else {
+                            print("Access token valid: expires \(date)")
+                        }
+                    }
                     if let perms = perms {
                         verifiedPerms = perms
-                        let hasRepoContents = verifiedPerms.contains(where: {
-                            if case .repoContents = $0 {
-                                return true
-                            } else {
-                                return false
-                            }
-                        })
-                        let hasRepoList = verifiedPerms.contains(where: {
-                            if case .repoList = $0 {
-                                return true
-                            } else {
-                                return false
-                            }
-                        })
-                        missingRepoContents = !hasRepoContents
-                        missingRepoList = !hasRepoList
-                        if hasRepoContents && hasRepoList {
-                            testingResult = true
-                            forceAdd(authItem: authItem)
-                        } else {
-                            testingResult = false
-                            gitProvider?.deleteAccessTokenOrPassword()
-                        }
+                        testingResult = true
+                        forceAdd(authItem: authItem)
+//                        let hasRepoContents = verifiedPerms.contains(where: {
+//                            if case .repoContents = $0 {
+//                                return true
+//                            } else {
+//                                return false
+//                            }
+//                        })
+//                        let hasRepoList = verifiedPerms.contains(where: {
+//                            if case .repoList = $0 {
+//                                return true
+//                            } else {
+//                                return false
+//                            }
+//                        })
+//                        missingRepoContents = !hasRepoContents
+//                        missingRepoList = !hasRepoList
+//                        if hasRepoContents && hasRepoList {
+//                            testingResult = true
+//                            forceAdd(authItem: authItem)
+//                        } else {
+//                            testingResult = false
+//                            gitProvider?.deleteAccessTokenOrPassword()
+//                        }
                     } else {
                         testingResult = false
                     }
@@ -131,7 +143,28 @@ struct AddAccessTokenView: View, InstructionView {
         instruction(i: startI + 3, text: "Sync securely over iCloud Keychain? (recommended)", toggle: $iCloudSync)
         if isPassword {
             forceAddWithoutTestingStep(i: startI + 4)
-        } 
+        } else {
+            if let gitAPI = preset.api {
+                VStack(alignment: .leading, spacing: 7) {
+                    HStack {
+                        testingStep(i: startI + 4, with: (username: username, passOrAccessToken: passwordOrAccessToken, gitClient: gitAPI), successMessage: "Access token is successfully setup for \(hostName)!")
+                    }
+                    if testingResult == false {
+                        if missingRepoContents {
+                            Text("Missing permission(s) required for accessing repository contents").foregroundColor(.red).font(.footnote)
+                        }
+                        if missingRepoList {
+                            Text("Missing permission(s) required for discovering your private repositories").foregroundColor(.red).font(.footnote)
+                        }
+                        if missingRepoContents || missingRepoList {
+                            Text("You can fix this by going back to \(hostName) and creating a new access token with the permissions outlined above").font(.footnote)
+                        }
+                    }
+                }
+            } else {
+                forceAddWithoutTestingStep(i: startI + 4)
+            }
+        }
     }
     
     @ViewBuilder
@@ -163,7 +196,7 @@ struct AddAccessTokenView: View, InstructionView {
                     Text(badPracticeMessage)
                 }
             }
-            instructionSection(footer: "Note: This will grant access read\(isPassword ? "/write" : " or read/write") permissions to all\(isPassword ? "" : " or some") of your repository contents on \(hostName)") {
+            instructionSection(footer: "Note: This will grant read\(isPassword ? "/write" : " or read/write") permissions to all\(isPassword ? "" : " or some") of your repository contents on \(hostName)") {
                 if isPassword {
                     listPart2(startI: 0)
                 } else {

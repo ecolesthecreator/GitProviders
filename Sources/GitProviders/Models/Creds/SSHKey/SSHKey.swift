@@ -9,6 +9,8 @@ import Foundation
 import Security
 import KeychainAccess
 
+extension String: Error { }
+
 /// Should be safe in that using and passing around the object does not put any sensitive info into memory. Any sensitive info should be exposed through explicit use of a method.
 public struct SSHKey: Cred {
     let keychain: Keychain
@@ -24,7 +26,7 @@ public struct SSHKey: Cred {
     }
     /// okay to retain in memory, it's a public key
     var publicKeyAsSSHFormat: String? {
-        try? publicKeyData?.publicPEMKeyToSSHFormat()
+        try? publicKeyData?.ecPublicKeyToSSHFormat()
     }
     /// do not retain in memory, this data is highly sensitive!
     var privateKeyData: Data? {
@@ -106,6 +108,22 @@ public struct SSHKey: Cred {
             }
         }
         return nil
+    }
+
+    func storeKey<T: GenericPasswordConvertible>(_ key: T, account: String) throws {
+        // Treat the key data as a generic password.
+        let query = [kSecClass: kSecClassGenericPassword,
+                     kSecAttrAccount: account,
+                     kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked,
+                     kSecUseDataProtectionKeychain: true,
+                     kSecValueData: key.rawRepresentation] as [String: Any]
+
+
+        // Add the key data.
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw "Unable to store item: \(status)"
+        }
     }
 }
 

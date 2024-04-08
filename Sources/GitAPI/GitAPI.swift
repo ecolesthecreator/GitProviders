@@ -25,12 +25,16 @@ public struct UserInfo: Hashable {
     }
 }
 
+public enum GitApiMetadata: Hashable {
+    case tokenExpiration(Date)
+}
+
 public protocol GitAPI: AnyObject {
     var baseUrl: URL { get }
     var userInfo: UserInfo? { get set }
     static var shared: Self { get }
-    
-    func fetchGrantedScopes(callback: @escaping (_ grantedScopes: [PermScope]?, _ error: Error?) -> Void)
+
+    func fetchGrantedScopes(callback: @escaping (_ grantedScopes: [PermScope]?, _ metadata: [GitApiMetadata], _ error: Error?) -> Void)
     func fetchUserRepos(callback: @escaping (_ repos: [RepoModel]?, _ error: Error?) -> Void)
 }
 
@@ -47,12 +51,6 @@ extension GitAPI {
         if let authToken = userInfo?.authToken {
             request.addValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         }
-//        do {
-//            let parameters = makeClientVersionJSON()
-//            request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
-//        } catch {
-//            return
-//        }
         URLSession.shared.dataTaskPublisher(for: request).map { output -> (NetworkResponse?, Error?) in
             if let httpResponse = output.response as? HTTPURLResponse {
                 let networkResponse = NetworkResponse(

@@ -9,10 +9,11 @@ import Foundation
 
 extension Data {
     func printAsPEMPublicKey() -> String {
-        return appendPrefixSuffixTo(self.base64EncodedString(options: .lineLength64Characters), prefix: "-----BEGIN RSA PUBLIC KEY-----\n", suffix: "\n-----END RSA PUBLIC KEY-----")
+        return appendPrefixSuffixTo(self.base64EncodedString(options: .lineLength64Characters), prefix: "-----BEGIN PUBLIC KEY-----\n", suffix: "\n-----END PUBLIC KEY-----")
     }
+
     func printAsPEMPrivateKey() -> String {
-        return appendPrefixSuffixTo(self.base64EncodedString(options: .lineLength64Characters), prefix: "-----BEGIN RSA PRIVATE KEY-----\n", suffix: "\n-----END RSA PRIVATE KEY-----")
+        return appendPrefixSuffixTo(self.base64EncodedString(options: .lineLength64Characters), prefix: "-----BEGIN PRIVATE KEY-----\n", suffix: "\n-----END PRIVATE KEY-----")
     }
 }
 

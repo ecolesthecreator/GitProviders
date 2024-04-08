@@ -107,32 +107,35 @@ public struct GitCloneOptionsView: View {
                 let credOptions: [AnyRepositoryAccessMethodData] = gitProviderStore.gitProviders.reduce([], { arr, provider in
                     arr + provider.allAnyRepositoryAccessMethodDatas
                 }) + [.init(UnauthenticatedAccessMethodData())]
-//                GitCloneModalView(
-//                    closeModal: {
-//                        self.sheetItem = nil
-//                    },
-//                    selectedRepo: $selectedRepo,
-//                    fromGitProvider: $selectedGitProvider,
-//                    credOptions: credOptions,
-//                    cloningStatus: cloningStatus
-//                ).modifier(DisableModalDismiss(disabled: isCloning))
-            }
-//        }.onChange(of: cloningStatus.status?.repository) { repository in
-//            if let repository {
-//                sheetItem = nil
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//                    closeModal?(repository, cloningStatus.status?.remoteUrl)
-//                }
-//            } else {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-//                    cloningStatus.status = nil
-//                }
+               GitCloneModalView(
+                   selectedRepo: $selectedRepo,
+                   fromGitProvider: $selectedGitProvider,
+                   credOptions: credOptions,
+                   closeModal: { repoModel in
+                       if let repoModel {
+                           closeModal?(repoModel)
+                       }
+                       self.sheetItem = nil
+                   }
+               )
+         }
+       }
+//        .onChange(of: cloningStatus.status?.repository) { repository in
+//           if let repository {
+//               sheetItem = nil
+//               DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//                   closeModal?(repository, cloningStatus.status?.remoteUrl)
+//               }
+//           } else {
+//               DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+//                   cloningStatus.status = nil
+//               }
+//           }
+//        }.onChange(of: sources.count) { _ in
+//            if let first = sources.first {
+//                source = first.id
 //            }
-        }.onChange(of: sources.count) { _ in
-            if let first = sources.first {
-                source = first.id
-            }
-        }
+//        }
     }
 }
 

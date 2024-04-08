@@ -99,7 +99,8 @@ extension GitProvidersView {
         }
     }
     var showBottomPart: Bool {
-        activeOrCustomProviders.count > 0 || gitProviderStore.sshKey != nil
+        false
+//        activeOrCustomProviders.count > 0 || gitProviderStore.sshKey != nil
     }
     var mainBody: some View {
         List {
@@ -145,5 +146,5 @@ extension GitProvidersView {
 }
 
 func noticeText(_ appName: String) -> Text {
-    (Text("\(appName) does NOT store any git provider credentials on its servers. Rather, all access tokens, ssh keys, and other sensitve information are stored \(Text("securely").bold()) in your keychain and optionally synced through the iCloud keychain. Such keys are only brought into memory at point of consumption and are otherwise safely stored in the Secure Enclave. Furthermore, \(appName) does NOT sync any repository code keys onto its servers. See our privacy policy for more information.")).font(.footnote)
+    (Text("\(appName) does NOT store any git provider credentials on its servers (CodeStub does not have any servers). Rather, all access tokens, ssh keys, and other sensitve information are stored \(Text("securely").bold()) in your keychain and optionally synced through the iCloud keychain. Such keys are only brought into memory at point of consumption and are otherwise safely stored in the Secure Enclave. Furthermore, \(appName) does NOT sync any repository code keys onto its servers. See our privacy policy for more information.")).font(.footnote)
 }

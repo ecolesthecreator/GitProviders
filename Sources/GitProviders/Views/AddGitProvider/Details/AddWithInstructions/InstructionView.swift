@@ -9,6 +9,9 @@ import SwiftUI
 
 protocol InstructionView: View {
     associatedtype T
+    func testConnection(using authItem: T)
+    var isTesting: Bool { get }
+    var testingResult: Bool? { get }
     var preset: GitProviderPresets { get }
     var customDetails: CustomProviderDetails? { get }
     var gitProviderStore: GitProviderStore { get }
@@ -99,5 +102,39 @@ extension InstructionView {
             Text("Setup Instructions")
             Spacer()
         }, footer: Text(footer), content: content)
+    }
+
+    @ViewBuilder
+    func testingStep(i: Int, with authItem: T, successMessage: String) -> some View {
+        if isTesting {
+            HStack {
+                ProgressView().padding(.trailing, 2)
+                Text("Testing...this can take up to 10 seconds or more")
+            }
+        } else {
+            instruction(i: i, text: "Test connection") {
+                DispatchQueue.global(qos: .background).async {
+                    testConnection(using: authItem)
+                }
+            }
+        }
+        if let testingResult = testingResult {
+            if testingResult {
+                Text("Success").foregroundColor(.green).alert(isPresented: .constant(true), content: {
+                    Alert(title: Text("Success"), message: Text(successMessage), dismissButton: .default(Text("Okay"), action: {
+                        gitProviderStore.moveBackToFirstPage()
+                    }))
+                })
+            } else {
+                HStack {
+                    Text("Failed").foregroundColor(.red)
+                    Spacer()
+                    Button("Force Add") {
+                        forceAdd(authItem: authItem)
+                        gitProviderStore.moveBackToFirstPage()
+                    }.foregroundColor(.orange).font(.footnote).buttonStyle(BorderlessButtonStyle())
+                }
+            }
+        }
     }
 }

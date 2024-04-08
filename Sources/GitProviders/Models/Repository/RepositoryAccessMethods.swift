@@ -70,7 +70,7 @@ enum RepositoryAccessMethods: String, Identifiable {
         case .AccessToken, .Password:
             return "Are you sure what want to delete the \((accessMethodData as? AccessTokenAccessMethodData)?.isPassword ?? false ? "password": "access token") for profile \(profileName)?"
         case .SSH:
-            return "Are you sure what want to disassociate the public key \((try? (accessMethodData as? SSHAccessMethodData)?.publicKeyData.publicPEMKeyToSSHFormat()) ?? "") with profile \(profileName)?"
+            return "Are you sure what want to disassociate the public key \((try? (accessMethodData as? SSHAccessMethodData)?.publicKeyData.ecPublicKeyToSSHFormat()) ?? "") with profile \(profileName)?"
         }
     }
     

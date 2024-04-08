@@ -7,6 +7,14 @@
 
 import Foundation
 
+enum GitApiHelpers {
+    static let GitApiDateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        return dateFormatter
+    }()
+}
+
 public final class GitHubAPI: GitAPI {
     public let baseUrl = URL(string: "https://api.github.com/")!
     public var userInfo: UserInfo?
@@ -14,14 +22,18 @@ public final class GitHubAPI: GitAPI {
     public static let shared: GitHubAPI = .init()
     init() {}
     
-    public func fetchGrantedScopes(callback: @escaping (_ grantedScopes: [PermScope]?, _ error: Error?) -> Void) {
+    public func fetchGrantedScopes(callback: @escaping (_ grantedScopes: [PermScope]?, _ metadata: [GitApiMetadata], _ error: Error?) -> Void) {
         self.get("user") { response, error in
             if let response = response, let gitHubUser = response.body.parse(as: GitHubUserModel.self) {
                 guard gitHubUser.login == self.userInfo?.username else {
-                    callback(nil, error)
+                    callback(nil, [], error)
                     return
                 }
                 let scopeStrings = response.headers.readStringList(from: "x-oauth-scopes")
+                var metadata = [GitApiMetadata]()
+                if let expirationDateString = response.headers["github-authentication-token-expiration"] as? String {
+                    metadata.append(.tokenExpiration(GitApiHelpers.GitApiDateFormatter.date(from: expirationDateString) ?? Date()))
+                }
                 var scopes: [PermScope] = []
                 for scope in scopeStrings {
                     if scope == "repo" {
@@ -31,9 +43,9 @@ public final class GitHubAPI: GitAPI {
                         scopes.append(.unknown(raw: scope))
                     }
                 }
-                callback(scopes, nil)
+                callback(scopes, metadata, nil)
             } else {
-                callback(nil, error)
+                callback(nil, [], error)
             }
         }
     }

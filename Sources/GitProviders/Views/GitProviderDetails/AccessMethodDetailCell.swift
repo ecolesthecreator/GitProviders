@@ -53,9 +53,29 @@ struct AccessMethodDetailCell: View, Identifiable {
         isTesting = true
         DispatchQueue.global(qos: .background).async {
             gitClient.userInfo = .init(username: tokenCred.username, authToken: tokenCred.accessTokenOrPassword)
-            gitClient.fetchGrantedScopes { perms, _ in
+            gitClient.fetchGrantedScopes { perms, metadata, _ in
                 DispatchQueue.main.async {
-                    if perms?.count ?? 0 > 0 {
+
+                    let failure = {
+                        testingResult = false
+                        isTesting = false
+                        hasFailedTest = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            testingResult = nil
+                        }
+                    }
+
+                    let now = Date()
+                    for case let .tokenExpiration(date) in metadata {
+                        if date < now {
+                            print("Token Expired: \(date)")
+                            failure()
+                            return
+                        } else {
+                            print("Access token valid: expires \(date)")
+                        }
+                    }
+                    if perms != nil {
                         testingResult = true
                         isTesting = false
                         hasFailedTest = false
@@ -63,12 +83,7 @@ struct AccessMethodDetailCell: View, Identifiable {
                             testingResult = nil
                         }
                     } else {
-                        testingResult = false
-                        isTesting = false
-                        hasFailedTest = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            testingResult = nil
-                        }
+                        failure()
                     }
                 }
             }
@@ -130,7 +145,7 @@ struct AccessMethodDetailCell: View, Identifiable {
     var body: some View {
         Group {
             if let data = accessMethodData as? SSHAccessMethodData {
-                let publicKey = (try? data.publicKeyData.publicPEMKeyToSSHFormat()) ?? ""
+                let publicKey = (try? data.publicKeyData.ecPublicKeyToSSHFormat()) ?? ""
                 if tapped {
                     CopiableCellView(copiableText: publicKey, addRightOfButton: AnyView(testButton)).buttonStyle(BorderlessButtonStyle())
                 } else {

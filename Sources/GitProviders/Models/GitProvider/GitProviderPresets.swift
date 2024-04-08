@@ -73,7 +73,7 @@ enum GitProviderPresets: String, CaseIterable, Identifiable {
     var addAccessTokenPagePermissionForRepoContents: [String]? {
         switch self {
         case .GitHub:
-            return ["repo"]
+            return ["If classic token: `repo`\nIf fine-grained token: `Repository permissions/Contents` (Read and write)"]
         case .BitBucket:
             return ["Repositories Read", "Repositories Write"]
         case .GitLab:
@@ -86,7 +86,7 @@ enum GitProviderPresets: String, CaseIterable, Identifiable {
     var addAccessTokenPagePermissionForRepoList: [String]? {
         switch self {
         case .GitHub:
-            return ["repo"]
+            return ["If classic token: `repo`\nIf fine-grained token: `Repository permissions/Contents` (Read and write)"]
         case .BitBucket:
             return ["Repositories Read"]
         case .GitLab:
@@ -100,15 +100,19 @@ enum GitProviderPresets: String, CaseIterable, Identifiable {
         switch self {
         case .GitHub:
 //            return [.OAuth, .AccessToken, .SSH]
-            return [.AccessToken, .SSH]
+//            return [.AccessToken, .SSH]
+            return [.AccessToken]
         case .BitBucket:
 //            return [.OAuth, .AccessToken, .SSH, .Password]
-            return [.AccessToken, .SSH, .Password]
+//            return [.AccessToken, .SSH, .Password]
+            return [.AccessToken, .Password]
         case .GitLab:
 //            return [.OAuth, .AccessToken, .SSH, .Password]
-            return [.AccessToken, .SSH, .Password]
+//            return [.AccessToken, .SSH, .Password]
+            return [.AccessToken, .Password]
         case .Custom:
-            return [.SSH, .AccessToken, .Password]
+//            return [.SSH, .AccessToken, .Password]
+            return [.AccessToken, .Password]
         }
     }
 //    var supportedRepoListAccessMethods: [RepositoryAccessMethods] {
