@@ -73,7 +73,7 @@ enum GitProviderPresets: String, CaseIterable, Identifiable {
     var addAccessTokenPagePermissionForRepoContents: [String]? {
         switch self {
         case .GitHub:
-            return ["If classic token: `repo`\nIf fine-grained token: `Repository permissions/Contents` (Read and write)"]
+            return ["If classic token: **repo**\nIf fine-grained token: **Repository permissions/Contents** (Read and write)"]
         case .BitBucket:
             return ["Repositories Read", "Repositories Write"]
         case .GitLab:
@@ -86,7 +86,7 @@ enum GitProviderPresets: String, CaseIterable, Identifiable {
     var addAccessTokenPagePermissionForRepoList: [String]? {
         switch self {
         case .GitHub:
-            return ["If classic token: `repo`\nIf fine-grained token: `Repository permissions/Contents` (Read and write)"]
+            return ["If classic token: **repo**\nIf fine-grained token: **Repository permissions/Contents** (Read and write)"]
         case .BitBucket:
             return ["Repositories Read"]
         case .GitLab:

@@ -22,7 +22,6 @@ struct RepoCellView: View {
                 Spacer()
                 VStack(alignment: .trailing) {
                     Text(repo.isPrivate ? "private" : "public")
-                    Text("\(repo.size / 1000) KB")
                 }
             }
         }

@@ -133,12 +133,12 @@ struct AddAccessTokenView: View, InstructionView {
         instruction(
             i: startI + 1,
             text: "Enter your \(hostName) username below:",
-            input: ("username", $username)
+            input: ("Username", $username)
         )
         instruction(
             i: startI + 2,
             text: "Enter your\(isPassword ? "" : " new") \(hostName) \(isPassword ? "password" : "access token") below:",
-            secureInput: (isPassword ? "password" : "access token", $passwordOrAccessToken)
+            secureInput: (isPassword ? "Password" : "Access Token", $passwordOrAccessToken)
         )
         instruction(i: startI + 3, text: "Sync securely over iCloud Keychain? (recommended)", toggle: $iCloudSync)
         if isPassword {
@@ -175,7 +175,7 @@ struct AddAccessTokenView: View, InstructionView {
             Image(systemName: isValidated == nil ? "circle.fill" : (isValidated == true ? "checkmark.circle" : "x.circle"))
                 .scaleEffect(isValidated == nil ? 0.36 : 0.8)
                 .padding(.trailing, isValidated == nil ? 0 : 5)
-            Text(item)
+            Text(try! AttributedString(markdown: item, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
             if isValidated == false {
                 Spacer()
                 Text("access token missing permission \"\(item)\"").font(.footnote)
